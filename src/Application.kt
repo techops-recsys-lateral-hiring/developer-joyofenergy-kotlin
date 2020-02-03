@@ -1,4 +1,4 @@
-package de.tw
+package de.tw.energy
 
 import io.ktor.application.*
 import io.ktor.response.*
