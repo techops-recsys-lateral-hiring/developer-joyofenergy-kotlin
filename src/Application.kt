@@ -114,6 +114,13 @@ fun Application.module(testing: Boolean = false) {
                 val response = controller.calculatedCostForEachPricePlan(smartMeterId)
                 call.respond(response)
             }
+
+            get("/recommend/{smartMeterId}") {
+                val smartMeterId = call.parameters["smartMeterId"] ?: ""
+                val limit = call.request.queryParameters["limit"]
+                val response = controller.recommendCheapestPricePlans(smartMeterId, limit?.toInt())
+                call.respond(response)
+            }
         }
     }
 }

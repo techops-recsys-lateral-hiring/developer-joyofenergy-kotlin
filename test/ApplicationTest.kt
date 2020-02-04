@@ -62,6 +62,20 @@ class ApplicationTest {
         }
     }
 
+    @Test
+    fun `recommends a price plan`() {
+        withTestApplication({ module(testing = true) }) {
+            populateReadings()
+
+            handleRequest(HttpMethod.Get, "/price-plans/recommend/smart-meter-1?limit=2") {
+                addHeader(HttpHeaders.Accept, "application/json")
+            }.apply {
+                expectThat(response)
+                    .get { status() }.isEqualTo(HttpStatusCode.OK)
+            }
+        }
+    }
+
     private fun TestApplicationEngine.populateReadings() {
         handleRequest(HttpMethod.Post, "/readings/store") {
             addHeader(HttpHeaders.Accept, "application/json")
