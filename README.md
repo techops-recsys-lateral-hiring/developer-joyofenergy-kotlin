@@ -154,18 +154,17 @@ GET
 ## Build
 
 ```console
-$ gradle build
+$ ./gradlew build
 ```
 
 ## Test
 
 ```console
-$ gradle test # Run unit tests
-$ gradle functionalTest # Run functional tests
+$ ./gradlew test # Run unit tests
 ```
 
 ## Run
 
 ```console
-$ gradle run # available at localhost:8080 by default
+$ ./gradlew run # available at localhost:8080 by default
 ```

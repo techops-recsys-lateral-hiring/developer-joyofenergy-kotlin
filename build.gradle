@@ -55,3 +55,10 @@ compileTestKotlin {
         jvmTarget = '1.8'
     }
 }
+
+test {
+    dependsOn 'cleanTest'
+    testLogging {
+        events "passed", "skipped", "failed"
+    }
+}
