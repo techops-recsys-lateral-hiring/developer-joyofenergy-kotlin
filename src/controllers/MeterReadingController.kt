@@ -13,6 +13,12 @@ class MeterReadingController(private val readingService: MeterReadingService) {
     }
 
     fun storeReadings(readings: MeterReadings): Response<Nothing> {
-        return Response.internalError()
+        if (!readings.isValid())
+            return Response.internalError()
+
+        readingService.store(readings.smartMeterId, readings.readings)
+        return Response.empty()
     }
+
+    private fun MeterReadings.isValid() = smartMeterId.isNotBlank() && readings.isNotEmpty()
 }

@@ -46,4 +46,26 @@ class MeterReadingControllerTest {
             .isA<InternalErrorResponse>()
     }
 
+    @Test
+    fun `stores multiple batches of readings`() {
+        val readings = MeterReadings.generate(SMART_METER_ID)
+        val otherReadings = MeterReadings.generate(SMART_METER_ID)
+
+        controller.storeReadings(readings)
+        controller.storeReadings(otherReadings)
+
+        expectThat(meterReadingService[SMART_METER_ID]).isEqualTo(readings.readings + otherReadings.readings)
+    }
+
+    @Test
+    fun `stores readings for the right smart meter`() {
+        val readings = MeterReadings.generate(SMART_METER_ID)
+        val otherReadings = MeterReadings.generate(OTHER_SMART_METER_ID)
+
+        controller.storeReadings(readings)
+        controller.storeReadings(otherReadings)
+
+        expectThat(meterReadingService[SMART_METER_ID]).isEqualTo(readings.readings)
+    }
+
 }
