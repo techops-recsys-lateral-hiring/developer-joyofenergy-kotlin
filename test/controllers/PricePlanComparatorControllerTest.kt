@@ -67,4 +67,22 @@ class PricePlanComparatorControllerTest {
             .isA<ResponseWithBody<PricePlanComparatorController.CostsPerPlan>>()
             .get { body }.isEqualTo(expected)
     }
+
+    @Test
+    fun `recommends cheapest price plan without a limit`() {
+        val reading = ElectricityReading(Instant.now().minusSeconds(1800), BigDecimal.valueOf(35.0))
+        val otherReading = ElectricityReading(Instant.now(), BigDecimal.valueOf(3))
+        meterReadingService.store(SMART_METER_ID, listOf(reading, otherReading))
+
+        val expectedPricePlanToCost = listOf(
+            PRICE_PLAN_2_ID to BigDecimal.valueOf(38.0),
+            PRICE_PLAN_3_ID to BigDecimal.valueOf(76.0),
+            PRICE_PLAN_1_ID to BigDecimal.valueOf(380.0)
+        )
+
+        expectThat(controller.recommendCheapestPricePlans(SMART_METER_ID))
+            .isA<ResponseWithBody<List<Pair<String,BigDecimal>>>>()
+            .get { body }.isEqualTo(expectedPricePlanToCost)
+
+    }
 }

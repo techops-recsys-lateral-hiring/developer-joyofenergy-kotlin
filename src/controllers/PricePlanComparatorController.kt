@@ -30,4 +30,15 @@ class PricePlanComparatorController(
             }
         } ?: Response.notFound()
     }
+
+    fun recommendCheapestPricePlans(smartMeterId: String): Response<List<Pair<String, BigDecimal>>> {
+        val consumptionsForPricePlans = pricePlanService.consumptionCostOfElectricityReadingsPerPricePlan(smartMeterId)
+
+        return consumptionsForPricePlans?.let { consumptions ->
+            val recommendations = consumptions
+                .toList()
+                .sortedBy { it.second }
+            return Response.body(recommendations)
+        } ?: Response.notFound()
+    }
 }
