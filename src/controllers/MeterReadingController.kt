@@ -6,6 +6,8 @@ import de.tw.energy.services.MeterReadingService
 
 class MeterReadingController(private val readingService: MeterReadingService) {
     fun readings(smartMeterId: String): Response<List<ElectricityReading>> {
-        return Response.empty()
+        return readingService[smartMeterId]?.let {
+            Response.body(it)
+        } ?: Response.notFound()
     }
 }
