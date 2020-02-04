@@ -1,8 +1,5 @@
 package de.tw.energy
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.SerializationFeature
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import de.tw.energy.controllers.MeterReadingController
 import de.tw.energy.controllers.PricePlanComparatorController
 import de.tw.energy.domain.MeterReadings
@@ -28,13 +25,6 @@ import java.math.BigDecimal
 
 fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 
-fun ObjectMapper.setup(): ObjectMapper {
-    enable(SerializationFeature.INDENT_OUTPUT)
-    enable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-    registerModule(JavaTimeModule())
-    return this
-}
-
 suspend inline fun <T> ApplicationCall.respond(r: Response<T>) {
     response.status(r.statusCode)
 
@@ -42,20 +32,6 @@ suspend inline fun <T> ApplicationCall.respond(r: Response<T>) {
         response.pipeline.execute(this, r.body!!)
     }
 }
-
-private const val DR_EVILS_DARK_ENERGY_ENERGY_SUPPLIER = "Dr Evil's Dark Energy"
-private const val THE_GREEN_ECO_ENERGY_SUPPLIER = "The Green Eco"
-private const val POWER_FOR_EVERYONE_ENERGY_SUPPLIER = "Power for Everyone"
-
-private const val MOST_EVIL_PRICE_PLAN_ID = "price-plan-0"
-private const val RENEWABLES_PRICE_PLAN_ID = "price-plan-1"
-private const val STANDARD_PRICE_PLAN_ID = "price-plan-2"
-
-private const val SARAHS_SMART_METER_ID = "smart-meter-0"
-private const val PETERS_SMART_METER_ID = "smart-meter-1"
-private const val CHARLIES_SMART_METER_ID = "smart-meter-2"
-private const val ANDREAS_SMART_METER_ID = "smart-meter-3"
-private const val ALEXS_SMART_METER_ID = "smart-meter-4"
 
 @Suppress("unused") // Referenced in application.conf
 @kotlin.jvm.JvmOverloads
@@ -124,4 +100,3 @@ fun Application.module(testing: Boolean = false) {
         }
     }
 }
-
