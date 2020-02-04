@@ -11,6 +11,7 @@ sealed class Response<out T>() {
     }
 
     abstract val statusCode: HttpStatusCode
+
     override fun toString() = "Response[status=$statusCode]"
 }
 
