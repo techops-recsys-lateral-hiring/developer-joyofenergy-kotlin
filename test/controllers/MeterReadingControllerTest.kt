@@ -1,9 +1,6 @@
 package de.tw.energy.controllers
 
-import de.tw.energy.domain.ElectricityReading
-import de.tw.energy.domain.MeterReadings
-import de.tw.energy.domain.NotFoundResponse
-import de.tw.energy.domain.ResponseWithBody
+import de.tw.energy.domain.*
 import de.tw.energy.services.MeterReadingService
 import strikt.api.expectThat
 import strikt.assertions.isA
@@ -38,15 +35,15 @@ class MeterReadingControllerTest {
     }
 
     @Test
-    fun `returns the combination of all the stored readings`() {
-        val readings = MeterReadings.generate(SMART_METER_ID)
-        val otherReadings = MeterReadings.generate(SMART_METER_ID)
-
-        meterReadingService.store(readings.smartMeterId, readings.readings)
-        meterReadingService.store(otherReadings.smartMeterId, otherReadings.readings)
-
-        expectThat(controller.readings(SMART_METER_ID))
-            .isA<ResponseWithBody<List<ElectricityReading>>>()
-            .get { body }.isEqualTo(readings.readings + otherReadings.readings)
+    fun `returns error if storing readings for an empty meter`() {
+        expectThat(controller.storeReadings(MeterReadings.generate("")))
+            .isA<InternalErrorResponse>()
     }
+
+    @Test
+    fun `returns error if storing empty list of readings`() {
+        expectThat(controller.storeReadings(MeterReadings(SMART_METER_ID, listOf())))
+            .isA<InternalErrorResponse>()
+    }
+
 }
