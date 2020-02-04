@@ -15,6 +15,19 @@ class PricePlanComparatorController(
     )
 
     fun calculatedCostForEachPricePlan(smartMeterId: String): Response<CostsPerPlan> {
-        return Response.notFound()
+        val pricePlanId = accountService[smartMeterId]
+        val consumptionsForPricePlans = pricePlanService.consumptionCostOfElectricityReadingsPerPricePlan(smartMeterId)
+
+        return pricePlanId?.let { pricePlanId ->
+            consumptionsForPricePlans?.let { consumptions ->
+                Response.body(
+                    CostsPerPlan(
+                        pricePlanId,
+                        consumptions
+                    )
+                )
+
+            }
+        } ?: Response.notFound()
     }
 }
