@@ -31,13 +31,18 @@ class PricePlanComparatorController(
         } ?: Response.notFound()
     }
 
-    fun recommendCheapestPricePlans(smartMeterId: String): Response<List<Pair<String, BigDecimal>>> {
+    fun recommendCheapestPricePlans(
+        smartMeterId: String,
+        limit: Int? = null
+    ): Response<List<Pair<String, BigDecimal>>> {
         val consumptionsForPricePlans = pricePlanService.consumptionCostOfElectricityReadingsPerPricePlan(smartMeterId)
 
         return consumptionsForPricePlans?.let { consumptions ->
+            val adjustedLimit = if (limit == null || limit > consumptions.size) consumptions.size else limit
             val recommendations = consumptions
                 .toList()
                 .sortedBy { it.second }
+                .subList(0, adjustedLimit)
             return Response.body(recommendations)
         } ?: Response.notFound()
     }

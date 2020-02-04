@@ -83,6 +83,38 @@ class PricePlanComparatorControllerTest {
         expectThat(controller.recommendCheapestPricePlans(SMART_METER_ID))
             .isA<ResponseWithBody<List<Pair<String,BigDecimal>>>>()
             .get { body }.isEqualTo(expectedPricePlanToCost)
+    }
 
+    @Test
+    fun `recommends cheapest price with a limit`() {
+        val reading = ElectricityReading(Instant.now().minusSeconds(2700), BigDecimal.valueOf(5.0))
+        val otherReading = ElectricityReading(Instant.now(), BigDecimal.valueOf(20))
+        meterReadingService.store(SMART_METER_ID, listOf(reading, otherReading))
+
+        val expectedPricePlanToCost = listOf(
+            PRICE_PLAN_2_ID to BigDecimal.valueOf(16.7),
+            PRICE_PLAN_3_ID to BigDecimal.valueOf(33.4)
+        )
+
+        expectThat(controller.recommendCheapestPricePlans(SMART_METER_ID, 2))
+            .isA<ResponseWithBody<List<Pair<String,BigDecimal>>>>()
+            .get { body }.isEqualTo(expectedPricePlanToCost)
+    }
+
+    @Test
+    fun `recommends cheapest price with a limit bigger than the availability`() {
+        val reading = ElectricityReading(Instant.now().minusSeconds(3600), BigDecimal.valueOf(25.0))
+        val otherReading = ElectricityReading(Instant.now(), BigDecimal.valueOf(3))
+        meterReadingService.store(SMART_METER_ID, listOf(reading, otherReading))
+
+        val expectedPricePlanToCost = listOf(
+            PRICE_PLAN_2_ID to BigDecimal.valueOf(14.0),
+            PRICE_PLAN_3_ID to BigDecimal.valueOf(28.0),
+            PRICE_PLAN_1_ID to BigDecimal.valueOf(140.0)
+        )
+
+        expectThat(controller.recommendCheapestPricePlans(SMART_METER_ID, 5))
+            .isA<ResponseWithBody<List<Pair<String,BigDecimal>>>>()
+            .get { body }.isEqualTo(expectedPricePlanToCost)
     }
 }
