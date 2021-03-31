@@ -69,13 +69,13 @@ fun Application.module(testing: Boolean = false) {
             get("/read/{smartMeterId}") {
                 val smartMeterId = call.parameters["smartMeterId"] ?: ""
                 val response = controller.readings(smartMeterId)
-                call.respond(response)
+                call.respond(response.statusCode, response)
             }
 
             post("/store") {
                 val readings = call.receive<MeterReadings>()
                 val response = controller.storeReadings(readings)
-                call.respond(response)
+                call.respond(response.statusCode, response)
             }
         }
 
@@ -88,14 +88,14 @@ fun Application.module(testing: Boolean = false) {
             get("/compare-all/{smartMeterId}") {
                 val smartMeterId = call.parameters["smartMeterId"] ?: ""
                 val response = controller.calculatedCostForEachPricePlan(smartMeterId)
-                call.respond(response)
+                call.respond(response.statusCode, response)
             }
 
             get("/recommend/{smartMeterId}") {
                 val smartMeterId = call.parameters["smartMeterId"] ?: ""
                 val limit = call.request.queryParameters["limit"]
                 val response = controller.recommendCheapestPricePlans(smartMeterId, limit?.toInt())
-                call.respond(response)
+                call.respond(response.statusCode, response)
             }
         }
     }
