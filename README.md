@@ -127,16 +127,11 @@ Example of body
 ```json
 {
   "smartMeterId": <smartMeterId>,
-  "electricityReadings": [
+  "readings": [
     {
       "time": <time>,
       "reading": <reading>
-    },
-    {
-      "time": <time>,
-      "reading": <reading>
-    },
-    ...
+    }
   ]
 }
 ```
@@ -153,22 +148,27 @@ Example readings
 
 | Date (`GMT`)      | Epoch timestamp | Reading (`kW`) |
 | ----------------- | --------------: | -------------: |
-| `2020-11-11 8:00` |      1605081600 |         0.0503 |
-| `2020-11-12 8:00` |      1605168000 |         0.0213 |
+| `2020-11-29 8:00` |      1606636800 |         0.0503 |
+| `2020-11-29 8:01` |      1606636860 |         0.0621 |
+| `2020-11-29 8:02` |      1606636920 |         0.0222 |
+| `2020-11-29 8:03` |      1606636980 |         0.0423 |
+| `2020-11-29 8:04` |      1606637040 |         0.0191 |
 
-In the above example, `0.0213 kW` were being consumed at `2020-11-12 8:00`. The reading indicates the powered being used
-at the time of the reading. If no power is being used at the time of reading, then the reading value will be `0`. Given
-that `0` may introduce new challenges, we can assume that there is always some consumption, and we will never have a `0`
-reading value.
+In the above example, the smart meter sampled readings, in `kW`, every minute. Note that the reading is in `kW` and
+not `kWH`, which means that each reading represents the consumption at the reading time. If no power is being consumed
+at the time of reading, then the reading value will be `0`. Given that `0` may introduce new challenges, we can assume
+that there is always some consumption, and we will never have a `0` reading value. These readings are then sent by the
+smart meter to the application using REST. There is a service in the application that calculates the `kWH` from these
+readings.
 
-Posting readings using CURL
+The following POST request, is an example request using CURL, sends the readings shown in the table above.
 
 ```console
 $ curl \
   -X POST \
   -H "Content-Type: application/json" \
   "http://localhost:8080/readings/store" \
-  -d '{"smartMeterId":"smart-meter-0","readings":[{"time":1605081600,"reading":0.0503},{"time":1605168000,"reading":0.0213}]}'
+  -d '{"smartMeterId":"smart-meter-0","readings":[{"time":1606636800,"reading":0.0503},{"time":1606636860,"reading":0.0621},{"time":1606636920,"reading":0.0222},{"time":1606636980,"reading":0.0423},{"time":1606637040,"reading":0.0191}]}'
 ```
 
 The above command should return.
@@ -212,12 +212,24 @@ Example output
   },
   "body": [
     {
-      "time": 1605081600.000000000,
+      "time": 1606636800.000000000,
       "reading": 0.0503
     },
     {
-      "time": 1605168000.000000000,
-      "reading": 0.0213
+      "time": 1606636860.000000000,
+      "reading": 0.0621
+    },
+    {
+      "time": 1606636920.000000000,
+      "reading": 0.0222
+    },
+    {
+      "time": 1606636980.000000000,
+      "reading": 0.0423
+    },
+    {
+      "time": 1606637040.000000000,
+      "reading": 0.0191
     }
   ]
 }
@@ -254,8 +266,8 @@ Example output
   "body": {
     "pricePlanId": "price-plan-0",
     "pricePlanComparisons": {
-      "price-plan-0": 0.0150,
-      "price-plan-2": 0.0015
+      "price-plan-0": 5.8800,
+      "price-plan-2": 0.5880
     }
   }
 }
@@ -293,11 +305,11 @@ Example output
   "body": [
     {
       "first": "price-plan-2",
-      "second": 0.0015
+      "second": 0.5880
     },
     {
       "first": "price-plan-0",
-      "second": 0.0150
+      "second": 5.8800
     }
   ]
 }
