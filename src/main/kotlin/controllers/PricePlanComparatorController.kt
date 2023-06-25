@@ -18,11 +18,11 @@ class PricePlanComparatorController(
         val pricePlanId = accountService[smartMeterId]
         val consumptionsForPricePlans = pricePlanService.consumptionCostOfElectricityReadingsPerPricePlan(smartMeterId)
 
-        return pricePlanId?.let { pricePlanId ->
+        return pricePlanId?.let { retrievedPricePlanId ->
             consumptionsForPricePlans?.let { consumptions ->
                 Response.body(
                     CostsPerPlan(
-                        pricePlanId,
+                        retrievedPricePlanId,
                         consumptions
                     )
                 )
