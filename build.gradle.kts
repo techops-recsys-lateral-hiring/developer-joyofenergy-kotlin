@@ -1,12 +1,18 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
-    id ("application")
-    id ("org.jetbrains.kotlin.jvm")
+    application
+    kotlin("jvm")
 }
 
+val kotlin_version: String by project
+val ktor_version: String by project
+val logback_version: String by project
+val jackson_version: String by project
+val strikt_version: String by project
 
-def appMainClass = "io.ktor.server.netty.EngineMain"
+
+val appMainClass = "io.ktor.server.netty.EngineMain"
 
 application {
     mainClass.set(appMainClass)
@@ -30,34 +36,25 @@ dependencies {
     testImplementation("io.strikt:strikt-core:$strikt_version")
 }
 
-compileKotlin {
-    compilerOptions {
-        freeCompilerArgs.add("-Xjsr305=strict")
-        jvmTarget.set(JvmTarget.JVM_17)
+kotlin {
+    jvmToolchain(17)
+}
+
+tasks {
+    test {
+        //dependsOn("cleanTest")
+        testLogging {
+            events("passed", "skipped", "failed")
+        }
     }
 }
 
-compileTestKotlin {
-    compilerOptions {
-        freeCompilerArgs.add("-Xjsr305=strict")
-        jvmTarget.set(JvmTarget.JVM_17)
-    }
-}
-
-test {
-    dependsOn("cleanTest")
-    testLogging {
-        events("passed", "skipped", "failed")
-    }
-}
-
-jar {
-    manifest {
-        attributes( "Main-Class": appMainClass)
-    }
-
-    from {
-        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
-    }
-    duplicatesStrategy("exclude")
+tasks.jar {
+    manifest.attributes["Main-Class"] = appMainClass
+    val dependencies = configurations
+        .runtimeClasspath
+        .get()
+        .map(::zipTree)
+    from(dependencies)
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
