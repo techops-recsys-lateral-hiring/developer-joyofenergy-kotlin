@@ -20,7 +20,7 @@ class ApplicationTest {
 
     @Test
     fun `stores readings`() {
-        withTestApplication({ module(testing = true) }) {
+        withTestApplication({ module() }) {
             handleRequest(HttpMethod.Post, "/readings/store") {
                 addHeader(HttpHeaders.Accept, "application/json")
                 addHeader(HttpHeaders.ContentType, "application/json")
@@ -35,7 +35,7 @@ class ApplicationTest {
 
     @Test
     fun `retrieves readings`() {
-        withTestApplication({ module(testing = true) }) {
+        withTestApplication({ module() }) {
             populateReadings()
 
             handleRequest(HttpMethod.Get, "/readings/read/smart-meter-1") {
@@ -50,7 +50,7 @@ class ApplicationTest {
 
     @Test
     fun `compares prices`() {
-        withTestApplication({ module(testing = true) }) {
+        withTestApplication({ module() }) {
             populateReadings()
 
             handleRequest(HttpMethod.Get, "/price-plans/compare-all/smart-meter-1") {
@@ -64,7 +64,7 @@ class ApplicationTest {
 
     @Test
     fun `recommends a price plan`() {
-        withTestApplication({ module(testing = true) }) {
+        withTestApplication({ module() }) {
             populateReadings()
 
             handleRequest(HttpMethod.Get, "/price-plans/recommend/smart-meter-1?limit=2") {

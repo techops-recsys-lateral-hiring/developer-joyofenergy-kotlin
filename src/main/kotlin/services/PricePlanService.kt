@@ -34,8 +34,8 @@ class PricePlanService(private val pricePlans: List<PricePlan>, private val mete
     }
 
     private fun calculateTimeElapsed(readings: List<ElectricityReading>): BigDecimal {
-        val first = readings.minBy { it.time }!!
-        val last = readings.maxBy { it.time }!!
+        val first = readings.minBy { it.time }
+        val last = readings.maxBy { it.time }
 
         return BigDecimal.valueOf(
             Duration.between(first.time, last.time)
