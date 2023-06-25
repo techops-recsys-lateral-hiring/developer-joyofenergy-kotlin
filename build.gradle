@@ -1,11 +1,5 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-}
-
 plugins {
     id ("application")
     id ("org.jetbrains.kotlin.jvm").version("1.8.22")
