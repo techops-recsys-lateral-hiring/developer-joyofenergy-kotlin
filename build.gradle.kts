@@ -1,5 +1,3 @@
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-
 plugins {
     application
     kotlin("jvm")
@@ -42,7 +40,7 @@ kotlin {
 
 tasks {
     test {
-        //dependsOn("cleanTest")
+        dependsOn("cleanTest")
         testLogging {
             events("passed", "skipped", "failed")
         }
