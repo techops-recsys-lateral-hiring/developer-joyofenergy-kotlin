@@ -1,15 +1,13 @@
 package de.tw.energy.controllers
 
 import de.tw.energy.domain.ElectricityReading
-import de.tw.energy.domain.NotFoundResponse
 import de.tw.energy.domain.PricePlan
-import de.tw.energy.domain.ResponseWithBody
 import de.tw.energy.services.AccountService
 import de.tw.energy.services.MeterReadingService
 import de.tw.energy.services.PricePlanService
 import strikt.api.expectThat
-import strikt.assertions.isA
 import strikt.assertions.isEqualTo
+import strikt.assertions.isNull
 import java.math.BigDecimal
 import java.time.Instant
 import kotlin.test.Test
@@ -43,7 +41,7 @@ class PricePlanComparatorControllerTest {
     @Test
     fun `returns not found when calculating costs for a non matching meter id`() {
         expectThat(controller.calculatedCostForEachPricePlan("not-found"))
-            .isA<NotFoundResponse>()
+            .isNull()
     }
 
     @Test
@@ -64,8 +62,7 @@ class PricePlanComparatorControllerTest {
         )
 
         expectThat(controller.calculatedCostForEachPricePlan(SMART_METER_ID))
-            .isA<ResponseWithBody<PricePlanComparatorController.CostsPerPlan>>()
-            .get { body }.isEqualTo(expected)
+            .isEqualTo(expected)
     }
 
     @Test
@@ -81,8 +78,7 @@ class PricePlanComparatorControllerTest {
         )
 
         expectThat(controller.recommendCheapestPricePlans(SMART_METER_ID))
-            .isA<ResponseWithBody<List<Pair<String,BigDecimal>>>>()
-            .get { body }.isEqualTo(expectedPricePlanToCost)
+            .isEqualTo(expectedPricePlanToCost)
     }
 
     @Test
@@ -97,8 +93,7 @@ class PricePlanComparatorControllerTest {
         )
 
         expectThat(controller.recommendCheapestPricePlans(SMART_METER_ID, 2))
-            .isA<ResponseWithBody<List<Pair<String,BigDecimal>>>>()
-            .get { body }.isEqualTo(expectedPricePlanToCost)
+            .isEqualTo(expectedPricePlanToCost)
     }
 
     @Test
@@ -114,7 +109,6 @@ class PricePlanComparatorControllerTest {
         )
 
         expectThat(controller.recommendCheapestPricePlans(SMART_METER_ID, 5))
-            .isA<ResponseWithBody<List<Pair<String,BigDecimal>>>>()
-            .get { body }.isEqualTo(expectedPricePlanToCost)
+            .isEqualTo(expectedPricePlanToCost)
     }
 }

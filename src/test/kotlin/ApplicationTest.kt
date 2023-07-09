@@ -2,13 +2,10 @@ package de.tw.energy
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import de.tw.energy.domain.MeterReadings
-import io.ktor.http.HttpHeaders
-import io.ktor.http.HttpMethod
-import io.ktor.http.HttpStatusCode
-import io.ktor.server.testing.TestApplicationEngine
-import io.ktor.server.testing.handleRequest
-import io.ktor.server.testing.setBody
-import io.ktor.server.testing.withTestApplication
+import io.ktor.client.*
+import io.ktor.client.request.*
+import io.ktor.http.*
+import io.ktor.server.testing.*
 import strikt.api.expectThat
 import strikt.assertions.isEqualTo
 import kotlin.test.Test
@@ -20,68 +17,57 @@ class ApplicationTest {
 
     @Test
     fun `stores readings`() {
-        withTestApplication({ module() }) {
-            handleRequest(HttpMethod.Post, "/readings/store") {
-                addHeader(HttpHeaders.Accept, "application/json")
-                addHeader(HttpHeaders.ContentType, "application/json")
+        testApplication {
+            val response = client.post("/readings/store") {
+                header(HttpHeaders.Accept, ContentType.Application.Json)
+                header(HttpHeaders.ContentType, ContentType.Application.Json)
                 setBody(MeterReadings.generate("smart-meter-1").toJson())
-
-            }.apply {
-                expectThat(response)
-                    .get { status() }.isEqualTo(HttpStatusCode.OK)
             }
+            expectThat(response).get { status }.isEqualTo(HttpStatusCode.OK)
         }
     }
 
+
     @Test
     fun `retrieves readings`() {
-        withTestApplication({ module() }) {
-            populateReadings()
-
-            handleRequest(HttpMethod.Get, "/readings/read/smart-meter-1") {
-                addHeader(HttpHeaders.Accept, "application/json")
-
-            }.apply {
-                expectThat(response)
-                    .get { status() }.isEqualTo(HttpStatusCode.OK)
+        testApplication {
+            populateReadings(client)
+            val response = client.get("/readings/read/smart-meter-1") {
+                header(HttpHeaders.Accept, ContentType.Application.Json)
             }
+            expectThat(response).get { status }.isEqualTo(HttpStatusCode.OK)
         }
     }
 
     @Test
     fun `compares prices`() {
-        withTestApplication({ module() }) {
-            populateReadings()
 
-            handleRequest(HttpMethod.Get, "/price-plans/compare-all/smart-meter-1") {
-                addHeader(HttpHeaders.Accept, "application/json")
-            }.apply {
-                expectThat(response)
-                    .get { status() }.isEqualTo(HttpStatusCode.OK)
+        testApplication {
+            populateReadings(client)
+            val response = client.get("/price-plans/compare-all/smart-meter-1") {
+                header(HttpHeaders.Accept, ContentType.Application.Json)
             }
+            expectThat(response).get { status }.isEqualTo(HttpStatusCode.OK)
         }
     }
 
     @Test
     fun `recommends a price plan`() {
-        withTestApplication({ module() }) {
-            populateReadings()
-
-            handleRequest(HttpMethod.Get, "/price-plans/recommend/smart-meter-1?limit=2") {
-                addHeader(HttpHeaders.Accept, "application/json")
-            }.apply {
-                expectThat(response)
-                    .get { status() }.isEqualTo(HttpStatusCode.OK)
+        testApplication {
+            populateReadings(client)
+            val response = client.get("/price-plans/recommend/smart-meter-1?limit=2") {
+                header(HttpHeaders.Accept, ContentType.Application.Json)
             }
+            expectThat(response).get { status }.isEqualTo(HttpStatusCode.OK)
         }
     }
 
-    private fun TestApplicationEngine.populateReadings() {
-        handleRequest(HttpMethod.Post, "/readings/store") {
-            addHeader(HttpHeaders.Accept, "application/json")
-            addHeader(HttpHeaders.ContentType, "application/json")
-            setBody(MeterReadings.generate("smart-meter-1").toJson())
+    private suspend fun populateReadings(client: HttpClient) {
 
+        client.post("/readings/store") {
+            header(HttpHeaders.Accept, ContentType.Application.Json)
+            header(HttpHeaders.ContentType, ContentType.Application.Json)
+            setBody(MeterReadings.generate("smart-meter-1").toJson())
         }
     }
 }

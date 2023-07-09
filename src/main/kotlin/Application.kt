@@ -6,6 +6,7 @@ import de.tw.energy.domain.*
 import de.tw.energy.services.AccountService
 import de.tw.energy.services.MeterReadingService
 import de.tw.energy.services.PricePlanService
+import io.ktor.http.*
 import io.ktor.serialization.jackson.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*
@@ -51,14 +52,20 @@ fun Application.module() {
 
             get("/read/{smartMeterId}") {
                 val smartMeterId = call.parameters["smartMeterId"] ?: ""
-                val response = controller.readings(smartMeterId)
-                call.respond(response.statusCode, response)
+                controller.readings(smartMeterId)?.let {
+                    call.respond(it)
+                } ?: call.respond(HttpStatusCode.NotFound)
+
             }
 
             post("/store") {
                 val readings = call.receive<MeterReadings>()
-                val response = controller.storeReadings(readings)
-                call.respond(response.statusCode, response)
+                try {
+                    controller.storeReadings(readings)
+                    call.respond(HttpStatusCode.OK)
+                } catch (e:IllegalArgumentException) {
+                    call.respond(HttpStatusCode.BadRequest)
+                }
             }
         }
 
@@ -70,15 +77,17 @@ fun Application.module() {
 
             get("/compare-all/{smartMeterId}") {
                 val smartMeterId = call.parameters["smartMeterId"] ?: ""
-                val response = controller.calculatedCostForEachPricePlan(smartMeterId)
-                call.respond(response.statusCode, response)
+                controller.calculatedCostForEachPricePlan(smartMeterId)?.let {
+                    call.respond(it)
+                } ?: call.respond(HttpStatusCode.NotFound)
             }
 
             get("/recommend/{smartMeterId}") {
                 val smartMeterId = call.parameters["smartMeterId"] ?: ""
                 val limit = call.request.queryParameters["limit"]
-                val response = controller.recommendCheapestPricePlans(smartMeterId, limit?.toInt())
-                call.respond(response.statusCode, response)
+                controller.recommendCheapestPricePlans(smartMeterId, limit?.toInt())?.let {
+                    call.respond(it)
+                } ?: call.respond(HttpStatusCode.NotFound)
             }
         }
     }

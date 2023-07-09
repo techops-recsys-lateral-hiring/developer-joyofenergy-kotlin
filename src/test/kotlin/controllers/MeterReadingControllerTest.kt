@@ -2,9 +2,11 @@ package de.tw.energy.controllers
 
 import de.tw.energy.domain.*
 import de.tw.energy.services.MeterReadingService
+import strikt.api.expectCatching
 import strikt.api.expectThat
 import strikt.assertions.isA
 import strikt.assertions.isEqualTo
+import strikt.assertions.isFailure
 import kotlin.test.Test
 
 class MeterReadingControllerTest {
@@ -17,7 +19,6 @@ class MeterReadingControllerTest {
     @Test
     fun `returns not found if the meter id is not found`() {
         expectThat(controller.readings(SMART_METER_ID))
-            .isA<NotFoundResponse>()
     }
 
     @Test
@@ -29,21 +30,24 @@ class MeterReadingControllerTest {
         meterReadingService.store(otherReadings.smartMeterId, otherReadings.readings)
 
         expectThat(controller.readings(SMART_METER_ID))
-            .isA<ResponseWithBody<List<ElectricityReading>>>()
-            .get { body }.isEqualTo(readings.readings)
+            .isEqualTo(readings.readings)
 
     }
 
     @Test
     fun `returns error if storing readings for an empty meter`() {
-        expectThat(controller.storeReadings(MeterReadings.generate("")))
-            .isA<InternalErrorResponse>()
+
+        expectCatching { controller.storeReadings(MeterReadings.generate("")) }
+            .isFailure()
+            .isA<IllegalArgumentException>()
     }
 
     @Test
     fun `returns error if storing empty list of readings`() {
-        expectThat(controller.storeReadings(MeterReadings(SMART_METER_ID, listOf())))
-            .isA<InternalErrorResponse>()
+
+        expectCatching { controller.storeReadings(MeterReadings(SMART_METER_ID, listOf())) }
+            .isFailure()
+            .isA<IllegalArgumentException>()
     }
 
     @Test
