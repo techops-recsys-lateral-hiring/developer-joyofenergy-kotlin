@@ -30,6 +30,7 @@ dependencies {
 
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jackson_version")
 
+    testImplementation("org.jetbrains.kotlin:kotlin-test:$kotlin_version")
     testImplementation("io.ktor:ktor-server-tests:$ktor_version")
     testImplementation("io.strikt:strikt-core:$strikt_version")
 }

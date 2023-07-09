@@ -14,7 +14,7 @@ class MeterReadingControllerTest {
     val meterReadingService = MeterReadingService(mutableMapOf())
     val controller = MeterReadingController(meterReadingService)
 
-    @Test
+    @org.junit.Test
     fun `returns not found if the meter id is not found`() {
         expectThat(controller.readings(SMART_METER_ID))
             .isA<NotFoundResponse>()
