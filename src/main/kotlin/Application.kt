@@ -2,36 +2,21 @@ package de.tw.energy
 
 import de.tw.energy.controllers.MeterReadingController
 import de.tw.energy.controllers.PricePlanComparatorController
-import de.tw.energy.domain.MeterReadings
-import de.tw.energy.domain.PricePlan
-import de.tw.energy.domain.Response
-import de.tw.energy.domain.ResponseWithBody
+import de.tw.energy.domain.*
 import de.tw.energy.services.AccountService
 import de.tw.energy.services.MeterReadingService
 import de.tw.energy.services.PricePlanService
-import io.ktor.application.Application
-import io.ktor.application.ApplicationCall
-import io.ktor.application.call
-import io.ktor.application.install
-import io.ktor.features.ContentNegotiation
-import io.ktor.jackson.jackson
-import io.ktor.request.receive
-import io.ktor.response.respond
-import io.ktor.routing.get
-import io.ktor.routing.post
-import io.ktor.routing.route
-import io.ktor.routing.routing
+import io.ktor.serialization.jackson.*
+import io.ktor.server.application.*
+import io.ktor.server.request.*
+import io.ktor.server.routing.*
+
 import java.math.BigDecimal
+import io.ktor.server.plugins.contentnegotiation.*
+import io.ktor.server.response.*
 
 fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 
-suspend inline fun <T> ApplicationCall.respond(r: Response<T>) {
-    response.status(r.statusCode)
-
-    if (r is ResponseWithBody) {
-        response.pipeline.execute(this, r.body!!)
-    }
-}
 
 @Suppress("unused") // Referenced in application.conf
 fun Application.module() {
