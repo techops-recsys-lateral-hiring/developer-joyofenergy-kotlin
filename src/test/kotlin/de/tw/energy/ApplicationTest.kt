@@ -2,10 +2,15 @@ package de.tw.energy
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import de.tw.energy.domain.MeterReadings
-import io.ktor.client.*
-import io.ktor.client.request.*
-import io.ktor.http.*
-import io.ktor.server.testing.*
+import io.ktor.client.HttpClient
+import io.ktor.client.request.get
+import io.ktor.client.request.header
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
+import io.ktor.http.ContentType
+import io.ktor.http.HttpHeaders
+import io.ktor.http.HttpStatusCode
+import io.ktor.server.testing.testApplication
 import strikt.api.expectThat
 import strikt.assertions.isEqualTo
 import kotlin.test.Test
@@ -27,7 +32,6 @@ class ApplicationTest {
         }
     }
 
-
     @Test
     fun `retrieves readings`() {
         testApplication {
@@ -41,7 +45,6 @@ class ApplicationTest {
 
     @Test
     fun `compares prices`() {
-
         testApplication {
             populateReadings(client)
             val response = client.get("/price-plans/compare-all/smart-meter-1") {
@@ -63,7 +66,6 @@ class ApplicationTest {
     }
 
     private suspend fun populateReadings(client: HttpClient) {
-
         client.post("/readings/store") {
             header(HttpHeaders.Accept, ContentType.Application.Json)
             header(HttpHeaders.ContentType, ContentType.Application.Json)

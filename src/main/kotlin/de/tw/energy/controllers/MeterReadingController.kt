@@ -9,9 +9,10 @@ class MeterReadingController(private val readingService: MeterReadingService) {
         return readingService[smartMeterId]
     }
 
-    fun storeReadings(readings: MeterReadings): Unit {
-        if (!readings.isValid())
-            throw IllegalArgumentException()
+    fun storeReadings(readings: MeterReadings) {
+        require(readings.isValid()) {
+            "Readings supplied are invalid - they must not be blank for empty"
+        }
 
         readingService.store(readings.smartMeterId, readings.readings)
     }

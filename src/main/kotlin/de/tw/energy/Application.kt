@@ -2,22 +2,26 @@ package de.tw.energy
 
 import de.tw.energy.controllers.MeterReadingController
 import de.tw.energy.controllers.PricePlanComparatorController
-import de.tw.energy.domain.*
+import de.tw.energy.domain.MeterReadings
+import de.tw.energy.domain.PricePlan
 import de.tw.energy.services.AccountService
 import de.tw.energy.services.MeterReadingService
 import de.tw.energy.services.PricePlanService
-import io.ktor.http.*
-import io.ktor.serialization.jackson.*
-import io.ktor.server.application.*
-import io.ktor.server.request.*
-import io.ktor.server.routing.*
-
+import io.ktor.http.HttpStatusCode
+import io.ktor.serialization.jackson.jackson
+import io.ktor.server.application.Application
+import io.ktor.server.application.call
+import io.ktor.server.application.install
+import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.server.request.receive
+import io.ktor.server.response.respond
+import io.ktor.server.routing.get
+import io.ktor.server.routing.post
+import io.ktor.server.routing.route
+import io.ktor.server.routing.routing
 import java.math.BigDecimal
-import io.ktor.server.plugins.contentnegotiation.*
-import io.ktor.server.response.*
 
 fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
-
 
 @Suppress("unused") // Referenced in application.conf
 fun Application.module() {
@@ -28,23 +32,8 @@ fun Application.module() {
     }
 
     val meterReadingsService = MeterReadingService(mutableMapOf())
-    val pricePlanService = PricePlanService(
-        listOf(
-            PricePlan(MOST_EVIL_PRICE_PLAN_ID, DR_EVILS_DARK_ENERGY_ENERGY_SUPPLIER, BigDecimal.TEN, listOf()),
-            PricePlan(RENEWABLES_PRICE_PLAN_ID, THE_GREEN_ECO_ENERGY_SUPPLIER, BigDecimal(2), listOf()),
-            PricePlan(STANDARD_PRICE_PLAN_ID, POWER_FOR_EVERYONE_ENERGY_SUPPLIER, BigDecimal.ONE, listOf())
-        ),
-        meterReadingsService
-    )
-    val accountService = AccountService(
-        mapOf(
-            SARAHS_SMART_METER_ID to MOST_EVIL_PRICE_PLAN_ID,
-            PETERS_SMART_METER_ID to RENEWABLES_PRICE_PLAN_ID,
-            CHARLIES_SMART_METER_ID to MOST_EVIL_PRICE_PLAN_ID,
-            ANDREAS_SMART_METER_ID to STANDARD_PRICE_PLAN_ID,
-            ALEXS_SMART_METER_ID to RENEWABLES_PRICE_PLAN_ID
-        )
-    )
+    val pricePlanService = initPricePlanService(meterReadingsService)
+    val accountService = initAccountService()
 
     routing {
         route("/readings") {
@@ -55,7 +44,6 @@ fun Application.module() {
                 controller.readings(smartMeterId)?.let {
                     call.respond(it)
                 } ?: call.respond(HttpStatusCode.NotFound)
-
             }
 
             post("/store") {
@@ -63,8 +51,8 @@ fun Application.module() {
                 try {
                     controller.storeReadings(readings)
                     call.respond(HttpStatusCode.OK)
-                } catch (e:IllegalArgumentException) {
-                    call.respond(HttpStatusCode.BadRequest)
+                } catch (e: IllegalArgumentException) {
+                    call.respond(HttpStatusCode.BadRequest, e.message ?: "Invalid Request")
                 }
             }
         }
@@ -92,3 +80,22 @@ fun Application.module() {
         }
     }
 }
+
+private fun initAccountService() = AccountService(
+    mapOf(
+        SARAHS_SMART_METER_ID to MOST_EVIL_PRICE_PLAN_ID,
+        PETERS_SMART_METER_ID to RENEWABLES_PRICE_PLAN_ID,
+        CHARLIES_SMART_METER_ID to MOST_EVIL_PRICE_PLAN_ID,
+        ANDREAS_SMART_METER_ID to STANDARD_PRICE_PLAN_ID,
+        ALEXS_SMART_METER_ID to RENEWABLES_PRICE_PLAN_ID
+    )
+)
+
+private fun initPricePlanService(meterReadingsService: MeterReadingService) = PricePlanService(
+    listOf(
+        PricePlan(MOST_EVIL_PRICE_PLAN_ID, DR_EVILS_DARK_ENERGY_ENERGY_SUPPLIER, BigDecimal.TEN, listOf()),
+        PricePlan(RENEWABLES_PRICE_PLAN_ID, THE_GREEN_ECO_ENERGY_SUPPLIER, BigDecimal(2), listOf()),
+        PricePlan(STANDARD_PRICE_PLAN_ID, POWER_FOR_EVERYONE_ENERGY_SUPPLIER, BigDecimal.ONE, listOf())
+    ),
+    meterReadingsService
+)

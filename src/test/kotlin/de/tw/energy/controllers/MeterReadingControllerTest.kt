@@ -1,6 +1,6 @@
 package de.tw.energy.controllers
 
-import de.tw.energy.domain.*
+import de.tw.energy.domain.MeterReadings
 import de.tw.energy.services.MeterReadingService
 import strikt.api.expectCatching
 import strikt.api.expectThat
@@ -9,12 +9,13 @@ import strikt.assertions.isEqualTo
 import strikt.assertions.isFailure
 import kotlin.test.Test
 
-class MeterReadingControllerTest {
-    val SMART_METER_ID = "10101010"
-    val OTHER_SMART_METER_ID = "20202020"
+private const val SMART_METER_ID = "10101010"
+private const val OTHER_SMART_METER_ID = "20202020"
 
-    val meterReadingService = MeterReadingService(mutableMapOf())
-    val controller = MeterReadingController(meterReadingService)
+class MeterReadingControllerTest {
+
+    private val meterReadingService = MeterReadingService(mutableMapOf())
+    private val controller = MeterReadingController(meterReadingService)
 
     @Test
     fun `returns not found if the meter id is not found`() {
@@ -31,12 +32,10 @@ class MeterReadingControllerTest {
 
         expectThat(controller.readings(SMART_METER_ID))
             .isEqualTo(readings.readings)
-
     }
 
     @Test
     fun `returns error if storing readings for an empty meter`() {
-
         expectCatching { controller.storeReadings(MeterReadings.generate("")) }
             .isFailure()
             .isA<IllegalArgumentException>()
@@ -44,7 +43,6 @@ class MeterReadingControllerTest {
 
     @Test
     fun `returns error if storing empty list of readings`() {
-
         expectCatching { controller.storeReadings(MeterReadings(SMART_METER_ID, listOf())) }
             .isFailure()
             .isA<IllegalArgumentException>()
@@ -71,5 +69,4 @@ class MeterReadingControllerTest {
 
         expectThat(meterReadingService[SMART_METER_ID]).isEqualTo(readings.readings)
     }
-
 }

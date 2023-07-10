@@ -2,6 +2,7 @@
 plugins {
     kotlin("jvm")
     id("io.ktor.plugin")
+    id("io.gitlab.arturbosch.detekt")
 }
 
 val kotlin_version: String by project
@@ -9,6 +10,7 @@ val ktor_version: String by project
 val logback_version: String by project
 val jackson_version: String by project
 val strikt_version: String by project
+val detekt_version: String by project
 
 application {
     mainClass.set("io.ktor.server.netty.EngineMain")
@@ -32,6 +34,8 @@ dependencies {
     testImplementation("org.jetbrains.kotlin:kotlin-test:$kotlin_version")
     testImplementation("io.ktor:ktor-server-tests:$ktor_version")
     testImplementation("io.strikt:strikt-core:$strikt_version")
+
+    detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:$detekt_version")
 }
 
 kotlin {

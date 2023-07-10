@@ -12,17 +12,16 @@ import java.math.BigDecimal
 import java.time.Instant
 import kotlin.test.Test
 
+private const val PRICE_PLAN_1_ID = "test-supplier"
+private const val PRICE_PLAN_2_ID = "best-supplier"
+private const val PRICE_PLAN_3_ID = "second-best-supplier"
+private const val SMART_METER_ID = "smart-meter-id"
+private const val ENERGY_SUPPLIER_NAME = "Energy Supplier Name"
+
 class PricePlanComparatorControllerTest {
 
-    val PRICE_PLAN_1_ID = "test-supplier"
-    val PRICE_PLAN_2_ID = "best-supplier"
-    val PRICE_PLAN_3_ID = "second-best-supplier"
-    val SMART_METER_ID = "smart-meter-id"
-
-    val ENERGY_SUPPLIER_NAME = "Energy Supplier Name"
-
-    val meterReadingService = MeterReadingService(mutableMapOf())
-    val pricePlanService = PricePlanService(
+    private val meterReadingService = MeterReadingService(mutableMapOf())
+    private val pricePlanService = PricePlanService(
         listOf(
             PricePlan(PRICE_PLAN_1_ID, ENERGY_SUPPLIER_NAME, BigDecimal.TEN, listOf()),
             PricePlan(PRICE_PLAN_2_ID, ENERGY_SUPPLIER_NAME, BigDecimal.ONE, listOf()),
