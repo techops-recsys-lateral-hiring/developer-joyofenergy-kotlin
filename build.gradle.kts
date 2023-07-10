@@ -1,6 +1,7 @@
+
 plugins {
-    application
     kotlin("jvm")
+    id("io.ktor.plugin")
 }
 
 val kotlin_version: String by project
@@ -9,11 +10,8 @@ val logback_version: String by project
 val jackson_version: String by project
 val strikt_version: String by project
 
-
-val appMainClass = "io.ktor.server.netty.EngineMain"
-
 application {
-    mainClass.set(appMainClass)
+    mainClass.set("io.ktor.server.netty.EngineMain")
 }
 
 repositories {
@@ -49,12 +47,8 @@ tasks {
     }
 }
 
-tasks.jar {
-    manifest.attributes["Main-Class"] = appMainClass
-    val dependencies = configurations
-        .runtimeClasspath
-        .get()
-        .map(::zipTree)
-    from(dependencies)
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+ktor {
+    fatJar {
+        archiveFileName.set("developer-joyofenergy-kotlin-all.jar")
+    }
 }
