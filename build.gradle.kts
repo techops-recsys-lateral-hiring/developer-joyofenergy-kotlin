@@ -34,6 +34,7 @@ dependencies {
     testImplementation("org.jetbrains.kotlin:kotlin-test:$kotlin_version")
     testImplementation("io.ktor:ktor-server-tests:$ktor_version")
     testImplementation("io.strikt:strikt-core:$strikt_version")
+    testImplementation("io.ktor:ktor-client-content-negotiation:$ktor_version")
 
     detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:$detekt_version")
 }

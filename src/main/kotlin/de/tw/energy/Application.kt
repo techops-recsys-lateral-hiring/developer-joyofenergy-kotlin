@@ -4,6 +4,7 @@ import de.tw.energy.controllers.MeterReadingController
 import de.tw.energy.controllers.PricePlanComparatorController
 import de.tw.energy.domain.MeterReadings
 import de.tw.energy.domain.PricePlan
+import de.tw.energy.ktor.BodyAdapterPlugin
 import de.tw.energy.services.AccountService
 import de.tw.energy.services.MeterReadingService
 import de.tw.energy.services.PricePlanService
@@ -15,6 +16,7 @@ import io.ktor.server.application.install
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
+import io.ktor.server.response.respondNullable
 import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 import io.ktor.server.routing.route
@@ -25,6 +27,7 @@ fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 
 @Suppress("unused") // Referenced in application.conf
 fun Application.module() {
+    install(BodyAdapterPlugin)
     install(ContentNegotiation) {
         jackson {
             setup()
@@ -41,9 +44,7 @@ fun Application.module() {
 
             get("/read/{smartMeterId}") {
                 val smartMeterId = call.parameters["smartMeterId"] ?: ""
-                controller.readings(smartMeterId)?.let {
-                    call.respond(it)
-                } ?: call.respond(HttpStatusCode.NotFound)
+                call.respondNullable(controller.readings(smartMeterId))
             }
 
             post("/store") {
@@ -52,7 +53,7 @@ fun Application.module() {
                     controller.storeReadings(readings)
                     call.respond(HttpStatusCode.OK)
                 } catch (e: IllegalArgumentException) {
-                    call.respond(HttpStatusCode.BadRequest, e.message ?: "Invalid Request")
+                    call.respond(HttpStatusCode.BadRequest, e)
                 }
             }
         }
@@ -65,17 +66,13 @@ fun Application.module() {
 
             get("/compare-all/{smartMeterId}") {
                 val smartMeterId = call.parameters["smartMeterId"] ?: ""
-                controller.calculatedCostForEachPricePlan(smartMeterId)?.let {
-                    call.respond(it)
-                } ?: call.respond(HttpStatusCode.NotFound)
+                call.respondNullable(controller.calculatedCostForEachPricePlan(smartMeterId))
             }
 
             get("/recommend/{smartMeterId}") {
                 val smartMeterId = call.parameters["smartMeterId"] ?: ""
                 val limit = call.request.queryParameters["limit"]
-                controller.recommendCheapestPricePlans(smartMeterId, limit?.toInt())?.let {
-                    call.respond(it)
-                } ?: call.respond(HttpStatusCode.NotFound)
+                call.respondNullable(controller.recommendCheapestPricePlans(smartMeterId, limit?.toInt()))
             }
         }
     }
