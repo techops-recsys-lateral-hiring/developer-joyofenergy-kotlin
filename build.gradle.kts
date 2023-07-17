@@ -1,6 +1,8 @@
+
 plugins {
-    application
     kotlin("jvm")
+    id("io.ktor.plugin")
+    id("io.gitlab.arturbosch.detekt")
 }
 
 val kotlin_version: String by project
@@ -8,12 +10,10 @@ val ktor_version: String by project
 val logback_version: String by project
 val jackson_version: String by project
 val strikt_version: String by project
-
-
-val appMainClass = "io.ktor.server.netty.EngineMain"
+val detekt_version: String by project
 
 application {
-    mainClass.set(appMainClass)
+    mainClass.set("io.ktor.server.netty.EngineMain")
 }
 
 repositories {
@@ -26,12 +26,17 @@ dependencies {
     implementation("io.ktor:ktor-server-netty:$ktor_version")
     implementation("ch.qos.logback:logback-classic:$logback_version")
     implementation("io.ktor:ktor-server-core:$ktor_version")
-    implementation("io.ktor:ktor-jackson:$ktor_version")
+    implementation("io.ktor:ktor-server-content-negotiation:$ktor_version")
+    implementation("io.ktor:ktor-serialization-jackson:$ktor_version")
 
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jackson_version")
 
+    testImplementation("org.jetbrains.kotlin:kotlin-test:$kotlin_version")
     testImplementation("io.ktor:ktor-server-tests:$ktor_version")
     testImplementation("io.strikt:strikt-core:$strikt_version")
+    testImplementation("io.ktor:ktor-client-content-negotiation:$ktor_version")
+
+    detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:$detekt_version")
 }
 
 kotlin {
@@ -47,12 +52,8 @@ tasks {
     }
 }
 
-tasks.jar {
-    manifest.attributes["Main-Class"] = appMainClass
-    val dependencies = configurations
-        .runtimeClasspath
-        .get()
-        .map(::zipTree)
-    from(dependencies)
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+ktor {
+    fatJar {
+        archiveFileName.set("developer-joyofenergy-kotlin-all.jar")
+    }
 }

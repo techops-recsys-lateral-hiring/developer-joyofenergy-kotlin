@@ -13,10 +13,11 @@ fun Assertion.Builder<BigDecimal>.isCloseTo(target: BigDecimal) =
         it.minus(target).abs() < BigDecimal.valueOf(0.1)
     }
 
-class PricePlanTest {
-    val ENERGY_SUPPLIER_NAME = "Energy Supplier Name"
+private const val ENERGY_SUPPLIER_NAME = "Energy Supplier Name"
 
-    val peakTimeMultiplier = PricePlan.PeakTimeMultiplier(DayOfWeek.WEDNESDAY, BigDecimal.TEN)
+class PricePlanTest {
+
+    private val peakTimeMultiplier = PricePlan.PeakTimeMultiplier(DayOfWeek.WEDNESDAY, BigDecimal.TEN)
 
     @Test
     fun `returns the base price given an ordinary datetime`() {

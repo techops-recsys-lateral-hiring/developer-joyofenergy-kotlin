@@ -1,30 +1,27 @@
 package de.tw.energy.controllers
 
 import de.tw.energy.domain.ElectricityReading
-import de.tw.energy.domain.NotFoundResponse
 import de.tw.energy.domain.PricePlan
-import de.tw.energy.domain.ResponseWithBody
 import de.tw.energy.services.AccountService
 import de.tw.energy.services.MeterReadingService
 import de.tw.energy.services.PricePlanService
 import strikt.api.expectThat
-import strikt.assertions.isA
 import strikt.assertions.isEqualTo
+import strikt.assertions.isNull
 import java.math.BigDecimal
 import java.time.Instant
 import kotlin.test.Test
 
+private const val PRICE_PLAN_1_ID = "test-supplier"
+private const val PRICE_PLAN_2_ID = "best-supplier"
+private const val PRICE_PLAN_3_ID = "second-best-supplier"
+private const val SMART_METER_ID = "smart-meter-id"
+private const val ENERGY_SUPPLIER_NAME = "Energy Supplier Name"
+
 class PricePlanComparatorControllerTest {
 
-    val PRICE_PLAN_1_ID = "test-supplier"
-    val PRICE_PLAN_2_ID = "best-supplier"
-    val PRICE_PLAN_3_ID = "second-best-supplier"
-    val SMART_METER_ID = "smart-meter-id"
-
-    val ENERGY_SUPPLIER_NAME = "Energy Supplier Name"
-
-    val meterReadingService = MeterReadingService(mutableMapOf())
-    val pricePlanService = PricePlanService(
+    private val meterReadingService = MeterReadingService(mutableMapOf())
+    private val pricePlanService = PricePlanService(
         listOf(
             PricePlan(PRICE_PLAN_1_ID, ENERGY_SUPPLIER_NAME, BigDecimal.TEN, listOf()),
             PricePlan(PRICE_PLAN_2_ID, ENERGY_SUPPLIER_NAME, BigDecimal.ONE, listOf()),
@@ -43,7 +40,7 @@ class PricePlanComparatorControllerTest {
     @Test
     fun `returns not found when calculating costs for a non matching meter id`() {
         expectThat(controller.calculatedCostForEachPricePlan("not-found"))
-            .isA<NotFoundResponse>()
+            .isNull()
     }
 
     @Test
@@ -64,8 +61,7 @@ class PricePlanComparatorControllerTest {
         )
 
         expectThat(controller.calculatedCostForEachPricePlan(SMART_METER_ID))
-            .isA<ResponseWithBody<PricePlanComparatorController.CostsPerPlan>>()
-            .get { body }.isEqualTo(expected)
+            .isEqualTo(expected)
     }
 
     @Test
@@ -81,8 +77,7 @@ class PricePlanComparatorControllerTest {
         )
 
         expectThat(controller.recommendCheapestPricePlans(SMART_METER_ID))
-            .isA<ResponseWithBody<List<Pair<String,BigDecimal>>>>()
-            .get { body }.isEqualTo(expectedPricePlanToCost)
+            .isEqualTo(expectedPricePlanToCost)
     }
 
     @Test
@@ -97,8 +92,7 @@ class PricePlanComparatorControllerTest {
         )
 
         expectThat(controller.recommendCheapestPricePlans(SMART_METER_ID, 2))
-            .isA<ResponseWithBody<List<Pair<String,BigDecimal>>>>()
-            .get { body }.isEqualTo(expectedPricePlanToCost)
+            .isEqualTo(expectedPricePlanToCost)
     }
 
     @Test
@@ -114,7 +108,6 @@ class PricePlanComparatorControllerTest {
         )
 
         expectThat(controller.recommendCheapestPricePlans(SMART_METER_ID, 5))
-            .isA<ResponseWithBody<List<Pair<String,BigDecimal>>>>()
-            .get { body }.isEqualTo(expectedPricePlanToCost)
+            .isEqualTo(expectedPricePlanToCost)
     }
 }

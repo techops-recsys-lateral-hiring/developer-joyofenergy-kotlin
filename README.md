@@ -46,7 +46,7 @@ To trial the new JOI software 5 people from the JOI accounts team have agreed to
 data.
 
 | User    | Smart Meter ID  | Power Supplier        |
-| ------- | --------------- | --------------------- |
+|---------|-----------------|-----------------------|
 | Sarah   | `smart-meter-0` | Dr Evil's Dark Energy |
 | Peter   | `smart-meter-1` | The Green Eco         |
 | Charlie | `smart-meter-2` | Dr Evil's Dark Energy |
@@ -89,7 +89,7 @@ Run the application using Java and the executable JAR file produced by the Gradl
 listening to port `8080`.
 
 ```console
-$ java -jar build/libs/developer-joyofenergy-kotlin.jar
+$ java -jar build/libs/developer-joyofenergy-kotlin-all.jar
 ```
 
 ### Run the tests
@@ -139,7 +139,7 @@ Example of body
 Parameters
 
 | Parameter      | Description                                           |
-| -------------- | ----------------------------------------------------- |
+|----------------|-------------------------------------------------------|
 | `smartMeterId` | One of the smart meters' id listed above              |
 | `time`         | The date/time (as epoch) when the _reading_ was taken |
 | `reading`      | The consumption in `kW` at the _time_ of the reading  |
@@ -147,7 +147,7 @@ Parameters
 Example readings
 
 | Date (`GMT`)      | Epoch timestamp | Reading (`kW`) |
-| ----------------- | --------------: | -------------: |
+|-------------------|----------------:|---------------:|
 | `2020-11-29 8:00` |      1606636800 |         0.0503 |
 | `2020-11-29 8:01` |      1606636860 |         0.0621 |
 | `2020-11-29 8:02` |      1606636920 |         0.0222 |
@@ -193,7 +193,7 @@ GET /readings/read/<smartMeterId>
 Parameters
 
 | Parameter      | Description                              |
-| -------------- | ---------------------------------------- |
+|----------------|------------------------------------------|
 | `smartMeterId` | One of the smart meters' id listed above |
 
 Retrieving readings using CURL
@@ -246,7 +246,7 @@ GET /price-plans/compare-all/<smartMeterId>
 Parameters
 
 | Parameter      | Description                              |
-| -------------- | ---------------------------------------- |
+|----------------|------------------------------------------|
 | `smartMeterId` | One of the smart meters' id listed above |
 
 Retrieving readings using CURL
@@ -284,7 +284,7 @@ GET /price-plans/recommend/<smartMeterId>[?limit=<limit>]
 Parameters
 
 | Parameter      | Description                                          |
-| -------------- | ---------------------------------------------------- |
+|----------------|------------------------------------------------------|
 | `smartMeterId` | One of the smart meters' id listed above             |
 | `limit`        | (Optional) limit the number of plans to be displayed |
 

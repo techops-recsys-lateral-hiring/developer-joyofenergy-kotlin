@@ -6,14 +6,17 @@ import java.math.BigDecimal
 import java.math.RoundingMode
 import java.time.Duration
 
+private const val SECONDS_IN_AN_HOUR = 3600.0
+
 class PricePlanService(private val pricePlans: List<PricePlan>, private val meterReadingService: MeterReadingService) {
+
     fun consumptionCostOfElectricityReadingsPerPricePlan(smartMeterId: String): Map<String, BigDecimal>? {
         val readings = meterReadingService[smartMeterId]
 
         return readings?.let {
-            pricePlans.map { pricePlan ->
+            pricePlans.associate { pricePlan ->
                 pricePlan.planName to calculateCost(readings, pricePlan)
-            }.toMap()
+            }
         }
     }
 
@@ -28,7 +31,7 @@ class PricePlanService(private val pricePlans: List<PricePlan>, private val mete
     private fun calculateAverageReading(readings: List<ElectricityReading>): BigDecimal {
         val summedReadings = readings
             .map { it.reading }
-            .fold(BigDecimal.ZERO, { reading, acc -> reading.add(acc) })
+            .fold(BigDecimal.ZERO) { reading, acc -> reading.add(acc) }
 
         return summedReadings.divide(BigDecimal.valueOf(readings.size.toLong()), RoundingMode.HALF_UP)
     }
@@ -39,8 +42,7 @@ class PricePlanService(private val pricePlans: List<PricePlan>, private val mete
 
         return BigDecimal.valueOf(
             Duration.between(first.time, last.time)
-                .seconds / 3600.0
+                .seconds / SECONDS_IN_AN_HOUR
         )
     }
-
 }
