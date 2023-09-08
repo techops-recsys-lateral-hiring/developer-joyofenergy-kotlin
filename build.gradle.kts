@@ -3,6 +3,7 @@ plugins {
     kotlin("jvm")
     id("io.ktor.plugin")
     id("io.gitlab.arturbosch.detekt")
+    id("com.github.ben-manes.versions")
 }
 
 val kotlin_version: String by project
