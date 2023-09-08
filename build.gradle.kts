@@ -23,7 +23,7 @@ repositories {
 }
 
 dependencies {
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version")
     implementation("io.ktor:ktor-server-netty:$ktor_version")
     implementation("ch.qos.logback:logback-classic:$logback_version")
     implementation("io.ktor:ktor-server-core:$ktor_version")
@@ -32,7 +32,7 @@ dependencies {
 
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jackson_version")
 
-    testImplementation("org.jetbrains.kotlin:kotlin-test:$kotlin_version")
+    testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
     testImplementation("io.ktor:ktor-server-tests:$ktor_version")
     testImplementation("io.strikt:strikt-core:$strikt_version")
     testImplementation("io.ktor:ktor-client-content-negotiation:$ktor_version")
