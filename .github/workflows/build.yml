@@ -1,0 +1,32 @@
+name: Build and Test
+
+on:
+  push:
+    paths-ignore:
+      - '*.md'
+  pull_request:
+    paths-ignore:
+      - '*.md'
+
+jobs:
+  build-gradle:
+    name: Builds and tests in Gradle
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@master
+
+      - name: Restore Gradle caches
+        uses: actions/cache@master
+        env:
+          cache-name: gradle-cache
+        with:
+          path: ~/.gradle
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{hashFiles('**/build.gradle') }}
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+
+      - name: Build and test with Gradle
+        run: ./gradlew clean build
