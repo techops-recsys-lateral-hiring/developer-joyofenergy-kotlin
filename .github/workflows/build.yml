@@ -10,7 +10,7 @@ on:
 
 jobs:
   build-gradle:
-    name: Builds and tests in Gradle
+    name: Build and test in Gradle
     runs-on: ubuntu-latest
 
     steps:
@@ -28,5 +28,5 @@ jobs:
             ${{ runner.os }}-build-
             ${{ runner.os }}-
 
-      - name: Build and test with Gradle
+      - name: Run Gradle build and test
         run: ./gradlew clean build
